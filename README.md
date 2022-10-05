@@ -18,11 +18,9 @@ Role:
 Менеджер АК може переглядати кількість вже заброньованих/ще вільних місць, дані про пасажирів.
 
 # Ticket:
-
-- get_price//mgr, client
+- add_info//mgr, client
 - get_info (about ticket details)//mgr, client
 - get_discount//client
-- add_extra_luggage//mgr, client
 - get_numberofsit//client
 
 # Flight
@@ -36,6 +34,7 @@ Role:
 - registration
 - login
 - logout
+
 # Passenger
 
 - add_personal_info//mgr,client
@@ -46,7 +45,6 @@ Role:
 # Contacts
 
 - getcontacts//mgr, client
-- send_letter?//mgr
 
 # Mgr
 - login
