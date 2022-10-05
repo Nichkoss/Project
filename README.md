@@ -32,6 +32,10 @@ Role:
 - check_count_freesits//mgr, client
 - check_usedsits//mgr
 
+# User
+- registration
+- login
+- logout
 # Passenger
 
 - add_personal_info//mgr,client
@@ -41,11 +45,12 @@ Role:
 
 # Contacts
 
-- check-contacts//mgr, client
+- getcontacts//mgr, client
 - send_letter?//mgr
 
 # Mgr
-
+- login
+- logout
 - get_allpassengersinfo//mgr
 
 ![image](https://user-images.githubusercontent.com/113307928/193950619-b9c5050b-997b-4367-8810-3691e0eab379.png)
