@@ -1,3 +1,16 @@
+1. Install python 3.8.0
+
+2. pyenv install 3.8.13
+3. Create virtual environment:
+ - python3 -m venv venv
+4. Activate 
+  - venv\Scripts\activate.ps1
+5. In order to check which pythin version you are using
+  - python --version
+
+
+
+
 # Авіакомпанія
 
 # Сутності:
