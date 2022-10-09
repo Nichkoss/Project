@@ -4,13 +4,16 @@
  - python3 -m venv venv
 3. Activate 
   - venv\Scripts\activate.ps1
-4. In order to check which pythin version you are using
+4. pip freeze > requirements.txt
+5. In order to check which pythin version you are using
   - python --version
   
  ![image](https://user-images.githubusercontent.com/113307928/194427176-2e020990-4307-4e20-b2b2-a33b0bb820ad.png)
 
-5. Запускаємо програму у файлі app.py
-6. Копіюєм адресу з цього файлу та вставляємо у браузер
+6. Запускаємо програму у файлі app.py
+ Копіюєм адресу з цього файлу та вставляємо у браузер
+ АБО
+ Запускаємо програму у файлі app1.py і переходим за виданим посиланням, додаючи /api/v1/hello-world-13.
 
 
 
