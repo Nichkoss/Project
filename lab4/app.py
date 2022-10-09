@@ -1,6 +1,5 @@
 from flask import Flask
 from wsgiref.simple_server import make_server
-
 from blueprint import api_blueprint
 
 app = Flask(__name__)
