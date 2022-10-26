@@ -353,7 +353,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Passenger'
+              $ref: '#/components/schemas/Additional_Passenger'
         required: true
       responses:
         '201':
@@ -361,7 +361,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Passenger'
+                $ref: '#/components/schemas/Additional_Passenger'
         '412':
           description: Invalid input data
   /passenger/{id}:
@@ -385,14 +385,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Passenger'
+              $ref: '#/components/schemas/Additional_Passenger'
       responses:
         '200':
           description: The passenger data was successfully updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Passenger'
+                $ref: '#/components/schemas/Additional_Passenger'
         '404':
           description: Invalid passenger id, passenger not found
         '412':
@@ -419,7 +419,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Passenger'
+                $ref: '#/components/schemas/Additional_Passenger'
         '404':
           description: Invalid passenger id, passenger not found
   /ticket:
@@ -817,7 +817,28 @@ components:
           format: tinyint
           example: 1
           description: if user is a manager, this property must be equal to 1
-    Passenger:
+        firstname:
+          type: string
+          example: Jane
+        lastname:
+          type: string
+          example: Smith
+        birthdate:
+          type: string
+          format: date
+          example: 2001-01-01
+        pass_ser:
+          type: string
+          example: FN
+        pass_num:
+          type: integer
+          format: int64
+          example: 3378
+        expirydate:
+          type: string
+          format: date
+          example: 2032-08-30
+    Additional_Passenger:
       type: object
       properties:
         idpassenger:
@@ -882,10 +903,14 @@ components:
           type: integer
           format: int64 # 32?
           example: 3
+        create_time:
+          type: string
+          format: timestamp
+          example: 2022-08-30 00:00
         sit:
           $ref: '#/components/schemas/Sit'
         passenger:
-          $ref: '#/components/schemas/Passenger'
+          $ref: '#/components/schemas/Additional_Passenger'
     Sit:
       type: object
       properties: 
@@ -898,10 +923,6 @@ components:
           type: integer
           format: int64 # 32?
           example: 1
-        issue_date:
-          type: string
-          format: timestamp
-          example: 2022-10-30 00:30
         price:
           type: number
           format: float
@@ -920,12 +941,18 @@ components:
           format: int64
           readOnly: true
           example: 1
-        flight_from:
+        city_from:
           type: string
           example: Lviv
-        flight_to:
+        city_to:
           type: string
           example: London
+        airport_from:
+          type: string
+          example: Lviv National Airport
+        airport_to:
+          type: string
+          example: London Airport
         max_sits:
           type: integer
           format: int64 # int32
