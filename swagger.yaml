@@ -1,0 +1,986 @@
+openapi: "3.0.2"
+info:
+  title: API Title
+  version: "1.0"
+servers:
+  - url: http://127.0.0.1:5000
+tags:
+  - name: User
+    description: Operations with user
+  - name: Passenger
+    description: Operations with passenger
+  - name: Book
+    description: Operations with book
+  - name: Ticket
+    description: Operations with ticket
+  - name: Sit
+    description: Operations with sit
+  - name: Flight
+    description: Operations with flight
+
+paths:
+  /user:
+    post:
+      tags:
+        - User
+      summary: Create user
+      description: Add new client or manager account
+      requestBody:
+        description: New client or manager info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '201':
+          description: New user was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '409':
+          description: The user already exists
+        '412':
+          description: Invalid input data
+  /user/{id}:
+    put:
+      tags:
+        - User
+      security:
+        - cookieAuth_client: []
+        - cookieAuth_manager: []
+      summary: Update an existing user
+      description: Update personal information by id
+      parameters:
+        - name: id
+          in: path
+          description: id of user to be updated
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        description: Updated personal info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: The user data was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Invalid user id, user not found
+        '412':
+          description: Invalid input data
+    delete:
+      tags:
+        - User
+      security:
+        - cookieAuth_manager: []
+      summary: Delete an existing user
+      description: Delete an existing user by id
+      parameters:
+        - name: id
+          in: path
+          description: id of user to be deleted
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: The user was successfully deleted
+        '404':
+          description: Invalid user id, user not found
+    get:
+      tags:
+        - User
+      security:
+        - cookieAuth_client: []
+        - cookieAuth_manager: []
+      summary: Get user info
+      description: Get all info about an existing user by id
+      parameters:
+        - name: id
+          in: path
+          description: id of user to be returned
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: User was successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Invalid user id, user not found
+  /user/{id}/makeManager:
+    put:
+      tags:
+        - User
+      security:
+        - cookieAuth_manager: []
+      summary: Give a user manager rights
+      description: Update user role as 'manager' for user by id
+      parameters:
+        - name: id
+          in: path
+          description: id of user to be given manager rights
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: User role was successfully updated
+        '404':
+          description: Invalid user id, user not found
+  /user/getAll:
+    get:
+      tags:
+        - User
+      security:
+        - cookieAuth_manager: []
+      summary: Get all users
+      description: get the list of all users and their personal info
+      responses:
+        '200':
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /user/login:
+    post:
+      tags:
+        - User
+      security:
+        - basicAuth: []
+      summary: Log user into the system
+      description: Create a new session for an existing user
+#      requestBody:
+#        description: Authorization information
+#        content:
+#          application/json:
+#            schema:
+#              type: object
+#              properties:
+#                email:
+#                  type: string
+#                  example: m.anderson@gmil.com
+#                password:
+#                  type: string
+#                  example: 12345hhh
+      responses:
+        '201':
+          description: Session successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '412':
+          description: Invalid input data
+        '401':
+          description: User not authenticated
+  /user/logout:
+    delete:
+      tags:
+        - User
+      security:
+        - cookieAuth_client: []
+        - cookieAuth_manager: []
+      summary: Log user out of the system
+      description: End session for an existing user
+      responses:
+        '200':
+          description: Session successfully ended
+  /book:
+    post:
+      tags:
+        - Book
+      security:
+        - cookieAuth_client: []
+      summary: Add new book
+      description: Add book
+      requestBody:
+        description: New book info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+        required: true
+      responses:
+        '201':
+          description: New book was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '412':
+          description: Invalid input data
+  /book/{id}:
+    put:
+      tags:
+        - Book
+      security:
+        - cookieAuth_client: []
+      summary: Update an existing book
+      description: Update book information by id
+      parameters:
+        - name: id
+          in: path
+          description: id of book to be updated
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        description: Updated book info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '200':
+          description: The book data was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Invalid book id, book not found
+        '412':
+          description: Invalid input data
+    get:
+      tags:
+        - Book
+      security:
+        - cookieAuth_client: []
+        - cookieAuth_manager: []
+      summary: Get book info
+      description: Get all info about an existing book by id
+      parameters:
+        - name: id
+          in: path
+          description: id of book to be returned
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Book was successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Invalid book id, book not found
+    delete:
+      tags:
+        - Book
+      security:
+        - cookieAuth_client: []
+      summary: Delete an existing book
+      description: Delete book by id
+      parameters:
+        - name: id
+          in: path
+          description: id of book to be deleted
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: The book was successfully deleted
+        '404':
+          description: Invalid book id, book not found
+  /book/{id}/GetDiscount:
+    get:
+      tags:
+        - Book
+      security:
+        - cookieAuth_client: []
+      summary: Get discount
+      description: Get discount for book
+      parameters:
+        - name: id
+          in: path
+          description: id of book to set discount
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Discount was successfully returned
+          content:
+            application/json:
+              schema:
+                description: Discount and new price
+                type: object
+                properties:
+                  discount:
+                    type: integer
+                    example: 10
+                  price:
+                    type: number
+                    format: double
+                    example: 142.2
+        '404':
+          description: Invalid book id, book not found
+  /passenger:
+    post:
+      tags:
+        - Passenger
+      security:
+        - cookieAuth_client: []
+      summary: Add new passenger
+      description: Add passenger information (firstname, lastname, birthdate, pass_ser, pass_num, expirydate, email)
+      requestBody:
+        description: New passenger info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Additional_Passenger'
+        required: true
+      responses:
+        '201':
+          description: New passenger was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Additional_Passenger'
+        '412':
+          description: Invalid input data
+  /passenger/{id}:
+    put:
+      tags:
+        - Passenger
+      security:
+        - cookieAuth_client: []
+      summary: Update an existing passenger information
+      description: Update personal information by id
+      parameters:
+        - name: id
+          in: path
+          description: id of passenger to be updated
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        description: Updated passenger info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Additional_Passenger'
+      responses:
+        '200':
+          description: The passenger data was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Additional_Passenger'
+        '404':
+          description: Invalid passenger id, passenger not found
+        '412':
+          description: Invalid input data
+    get:
+      tags:
+        - Passenger
+      security:
+        - cookieAuth_client: []
+        - cookieAuth_manager: []
+      summary: Get passenger info
+      description: Get all info about an existing passenger by id
+      parameters:
+        - name: id
+          in: path
+          description: id of passenger to be returned
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Passenger was successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Additional_Passenger'
+        '404':
+          description: Invalid passenger id, passenger not found
+  /ticket:
+    post:
+      tags:
+        - Ticket
+      security:
+        - cookieAuth_client: []
+      summary: Add new ticket
+      description: Add ticket information ()
+      requestBody:
+        description: New ticket info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ticket'
+        required: true
+      responses:
+        '201':
+          description: New ticket was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '412':
+          description: Invalid input data
+  /ticket/{id}:
+    put:
+      tags:
+        - Ticket
+      security:
+        - cookieAuth_client: []
+      summary: Update an existing ticket information
+      description: Update ticket information by id
+      parameters:
+        - name: id
+          in: path
+          description: id of ticket to be updated
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        description: Updated ticket info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ticket'
+      responses:
+        '200':
+          description: The ticket data was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: Invalid ticket id, ticket not found
+        '412':
+          description: Invalid input data
+    get:
+      tags:
+        - Ticket
+      security:
+        - cookieAuth_client: []
+        - cookieAuth_manager: []
+      summary: Get ticket info
+      description: Get all info about an existing ticket by id
+      parameters:
+        - name: id
+          in: path
+          description: id of ticket to be returned
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Ticket was successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: Invalid ticket id, ticket not found
+    delete:
+      tags:
+        - Ticket
+      security:
+        - cookieAuth_client: []
+      summary: Delete an existing ticket
+      description: Delete ticket by id
+      parameters:
+        - name: id
+          in: path
+          description: id of ticket to be deleted
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: The ticket was successfully deleted
+        '404':
+          description: Invalid ticket id, ticket not found
+  /sit:
+    post:
+      tags:
+        - Sit
+      security:
+        - cookieAuth_manager: []
+      summary: Add new sit
+      description: Add sit information (sit number, available, price, flight id)
+      requestBody:
+        description: New sit info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sit'
+        required: true
+      responses:
+        '201':
+          description: New sit was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sit'
+        '412':
+          description: Invalid input data
+  /sit/{id}:
+    put:
+      tags:
+        - Sit
+      security:
+        - cookieAuth_manager: []
+      summary: Update an existing sit information
+      description: Update sit information by id
+      parameters:
+        - name: id
+          in: path
+          description: id of sit to be updated
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        description: Updated sit info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sit'
+      responses:
+        '200':
+          description: The sit data was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sit'
+        '404':
+          description: Invalid sit id, sit not found
+        '412':
+          description: Invalid input data
+    get:
+      tags:
+        - Sit
+      security:
+        - cookieAuth_client: []
+        - cookieAuth_manager: []
+      summary: Get sit info
+      description: Get all info about an existing sit by id
+      parameters:
+        - name: id
+          in: path
+          description: id of sit to be returned
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Sit was successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sit'
+        '404':
+          description: Invalid sit id, sit not found
+    delete:
+      tags:
+        - Sit
+      security:
+        - cookieAuth_manager: []
+      summary: Delete an existing sit
+      description: Delete sit by id
+      parameters:
+        - name: id
+          in: path
+          description: id of sit to be deleted
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: The sit was successfully deleted
+        '404':
+          description: Invalid sit id, sit not found
+  /flight:
+    post:
+      tags:
+        - Flight
+      security:
+        - cookieAuth_manager: []
+      summary: Add new flight
+      description: Add flight information (city from, city to, max number of sits, flight date)
+      requestBody:
+        description: New flight info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Flight'
+        required: true
+      responses:
+        '201':
+          description: New flight was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Flight'
+        '412':
+          description: Invalid input data
+  /flight/{id}:
+    put:
+      tags:
+        - Flight
+      security:
+        - cookieAuth_manager: []
+      summary: Update an existing flight information
+      description: Update flight information by id
+      parameters:
+        - name: id
+          in: path
+          description: id of flight to be updated
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        description: Updated flight info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Flight'
+      responses:
+        '200':
+          description: The flight data was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Flight'
+        '404':
+          description: Invalid flight id, flight not found
+        '412':
+          description: Invalid input data
+    get:
+      tags:
+        - Flight
+      security:
+        - cookieAuth_client: []
+        - cookieAuth_manager: []
+      summary: Get flight info
+      description: Get all info about an existing flight by id
+      parameters:
+        - name: id
+          in: path
+          description: id of flight to be returned
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Flight was successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Flight'
+        '404':
+          description: Invalid flight id, flight not found
+    delete:
+      tags:
+        - Flight
+      security:
+        - cookieAuth_manager: []
+      summary: Delete an existing flight
+      description: Delete flight by id
+      parameters:
+        - name: id
+          in: path
+          description: id of flight to be deleted
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: The flight was successfully deleted
+        '404':
+          description: Invalid flight id, flight not found
+  /flight/{id}/GetFreeSits:
+    get:
+      tags:
+        - Flight
+      security:
+        - cookieAuth_client: []
+        - cookieAuth_manager: []
+      summary: Get free sits
+      description: Get information about free sits of flight
+      parameters:
+        - name: id
+          in: path
+          description: id of flight to get number of free sits
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Number of free sits was successfully returned
+          content:
+            application/json:
+              schema:
+                description: Number of free sits
+                type: object
+                properties:
+                  freeSits:
+                    type: integer
+                    example: 50
+        '404':
+          description: Invalid flight id, flight not found
+  /flight/{id}/GetUsedSits:
+    get:
+      tags:
+        - Flight
+      security:
+        - cookieAuth_client: []
+        - cookieAuth_manager: []
+      summary: Get used sits
+      description: Get information about used sits of flight
+      parameters: 
+        - name: id
+          in: path
+          description: id of flight to get number of used sits
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Number of used sits was successfully returned
+          content:
+            application/json:
+              schema:
+                description: Number of used sits
+                type: object
+                properties:
+                  usedSits:
+                    type: integer
+                    example: 100
+        '404':
+          description: Invalid flight id, flight not found
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        iduser:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        email:
+          type: string
+          example: jane.smith@gmail.com
+          description: The email address of user, must be in the format of an email address, like example@gmail.com
+        password:
+          type: string
+          writeOnly: true
+          example: smith.1234
+        create_time:
+          type: string
+          format: timestamp
+          example: 2022-08-30 00:00
+        mgr:
+          type: boolean
+          format: tinyint
+          example: 1
+          description: if user is a manager, this property must be equal to 1
+        firstname:
+          type: string
+          example: Jane
+        lastname:
+          type: string
+          example: Smith
+        birthdate:
+          type: string
+          format: date
+          example: 2001-01-01
+        pass_ser:
+          type: string
+          example: FN
+        pass_num:
+          type: integer
+          format: int64
+          example: 3378
+        expirydate:
+          type: string
+          format: date
+          example: 2032-08-30
+    Additional_Passenger:
+      type: object
+      properties:
+        idpassenger:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        firstname:
+          type: string
+          example: Jane
+        lastname:
+          type: string
+          example: Smith
+        birthdate:
+          type: string
+          format: date
+          example: 2001-01-01
+        pass_ser:
+          type: string
+          example: FN
+        pass_num:
+          type: integer
+          format: int64
+          example: 3378
+        expirydate:
+          type: string
+          format: date
+          example: 2032-08-30
+        email:
+          type: string
+          example: jane.smith@gmail.com
+          description: The email address of user, must be in the format of an email address, like example@gmail.com.
+#        user:
+#          $ref: '#/components/schemas/User'
+    Book:
+      type: object
+      properties:
+        idbook:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        total_price:
+          type: number
+          format: double
+          example: 157.99
+        user:
+          $ref: '#/components/schemas/User'
+        ticket_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ticket'
+    Ticket:
+      type: object
+      properties: 
+        idticket:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        extra_lug:
+          type: integer
+          format: int64 # 32?
+          example: 3
+        create_time:
+          type: string
+          format: timestamp
+          example: 2022-08-30 00:00
+        sit:
+          $ref: '#/components/schemas/Sit'
+        passenger:
+          $ref: '#/components/schemas/Additional_Passenger'
+    Sit:
+      type: object
+      properties: 
+        idsit:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        sitnumber:
+          type: integer
+          format: int64 # 32?
+          example: 1
+        price:
+          type: number
+          format: float
+          example: 149.99
+        available:
+          type: boolean
+          example: 1
+          description: if sit is available, this property must be equal to 1
+        flight:
+          $ref: '#/components/schemas/Flight'
+    Flight:
+      type: object
+      properties:
+        idflight:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        city_from:
+          type: string
+          example: Lviv
+        city_to:
+          type: string
+          example: London
+        airport_from:
+          type: string
+          example: Lviv National Airport
+        airport_to:
+          type: string
+          example: London Airport
+        max_sits:
+          type: integer
+          format: int64 # int32
+          example: 150
+        flight_date:
+          type: string
+          format: timestamp
+          example: 2022-10-30 00:30
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth_client:
+      description: Client authentication
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+    cookieAuth_manager:
+      description: Manager authentication
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+#  securitySchemes:
+#    manager_auth:
+#      type: oauth2
+#      flows:
+#        implicit:
+#          authorizationUrl: https://airline_lanchuv/oauth/authorize
+#          scopes:
+#            write: add, update and delete users, orders, menu items and products
+#            read: read info about users, orders, menu items and products
