@@ -15,9 +15,33 @@
  АБО
  Запускаємо програму у файлі app1.py і переходим за виданим посиланням, додаючи /api/v1/hello-world-13.
 
+7. Для роботи з базою даних mysql необхідно встановити бібліотеку SQLAlchemy ORM , знаходячись у віртуальному середовищі: 
+```
+pip install Flask Flask-SQLAlchemy
+```
+8. Вказати URI до бази даних :
+Для mysql : app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://username:password@host:port/database_name"
+Для postgresql : app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://username:password@host:port/database_name"
 
+9. Для створення міграцій необхідно встановити бібліотку Alembic у віртуальному середовищі :
+```
+pip install alembic
+```
+10. Проініцюлювати Alembic:
+```
+alembic init alembic
+```
+11. Змінити налаштування в alembic.ini файлі: 
 
-
+sqlalchemy.url = mysql+mysqldb://root:root@localhost:3306/database_name
+12. Встановити пакет mysqlclient: 
+```
+pip install mysqlclient
+```
+13. Для створення міргації виконуємо команду 
+```
+alembic upgrade head
+```
 # Авіакомпанія
 
 # Сутності:
