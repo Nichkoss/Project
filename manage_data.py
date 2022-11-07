@@ -3,8 +3,8 @@ from lab4.models import app, db, AdditionalPassenger, Booking, Flight, Sit, Tick
 
 # session = Session()
 with app.app_context():
-    user = User(email="test1@gmail.com", password="qwqwqwqwqw", creation_time="2022-07-24 14:04:06.016547", mgr=0, firstname="Mary", lastname="Topmpson", birthdate="2008-11-22", pass_ser="GB", pass_num="808056", expirydate="2023-11-12")
-    user2 = User(email="test2@gmail.com", password="12345", creation_time="2022-10-20 14:04:06.016547", mgr=1,
+    user = Person(email="test1@gmail.com", password="qwqwqwqwqw", creation_time="2022-07-24 14:04:06.016547", mgr=0, firstname="Mary", lastname="Topmpson", birthdate="2008-11-22", pass_ser="GB", pass_num="808056", expirydate="2023-11-12")
+    user2 = Person(email="test2@gmail.com", password="12345", creation_time="2022-10-20 14:04:06.016547", mgr=1,
                 firstname="Lucy", lastname="Lockwood", birthdate="2001-09-08", pass_ser="GB", pass_num="789921",
                 expirydate="2024-08-14")
     additional_passenger = AdditionalPassenger(firstname="Laura", lastname="Debberson", birthdate="1998-07-02", email="test3@gmail.com", pass_ser="KB", pass_num="997645", expirydate="2022-12-28")
@@ -23,25 +23,25 @@ with app.app_context():
     db.session.add(flight2)
     db.session.commit()
 
-    booking = Booking(total_price=161, userid=user.iduser)
-    booking2 = Booking(total_price=161, userid=user2.iduser)
-    sit1 = Sit(sitnumber=23, available=1, price=80.50, flightid=flight.idflight)
-    sit2 = Sit(sitnumber=24, available=1, price=80.50, flightid=flight.idflight)
-    sit3 = Sit(sitnumber=12, available=1, price=80.50, flightid=flight2.idflight)
-    sit4 = Sit(sitnumber=13, available=1, price=80.50, flightid=flight2.idflight)
+    booking = Booking(total_price=161, personid=user.idperson)
+    booking2 = Booking(total_price=161, personid=user2.idperson)
+    seat1 = Seat(seatnumber=23, available=1, price=80.50, flightid=flight.idflight)
+    seat2 = Seat(seatnumber=24, available=1, price=80.50, flightid=flight.idflight)
+    seat3 = Seat(seatnumber=12, available=1, price=80.50, flightid=flight2.idflight)
+    seat4 = Seat(seatnumber=13, available=1, price=80.50, flightid=flight2.idflight)
     db.session.add(booking)
     db.session.add(booking2)
-    db.session.add(sit1)
-    db.session.add(sit2)
-    db.session.add(sit3)
-    db.session.add(sit4)
+    db.session.add(seat1)
+    db.session.add(seat2)
+    db.session.add(seat3)
+    db.session.add(seat4)
     db.session.commit()
 
-    ticket1 = Ticket(creation_date="2022-10-24 08:04:06.016547", sitid=sit1.idsit, bookingid=booking.idbooking, passengerid=additional_passenger.idpassenger)
-    ticket2 = Ticket(creation_date="2022-10-24 08:09:09.016547", sitid=sit2.idsit, bookingid=booking.idbooking)
-    ticket3 = Ticket(creation_date="2022-11-01 12:03:06.016547", sitid=sit3.idsit, extra_lug=1, bookingid=booking2.idbooking,
+    ticket1 = Ticket(creation_date="2022-10-24 08:04:06.016547", seatid=seat1.idseat, bookingid=booking.idbooking, passengerid=additional_passenger.idpassenger)
+    ticket2 = Ticket(creation_date="2022-10-24 08:09:09.016547", seatid=seat2.idseat, bookingid=booking.idbooking)
+    ticket3 = Ticket(creation_date="2022-11-01 12:03:06.016547", seatid=seat3.idseat, extra_lug=1, bookingid=booking2.idbooking,
                      passengerid=additional_passenger2.idpassenger)
-    ticket4 = Ticket(creation_date="2022-10-01 12:15:09.016547", sitid=sit4.idsit, bookingid=booking2.idbooking)
+    ticket4 = Ticket(creation_date="2022-10-01 12:15:09.016547", seatid=seat4.idseat, bookingid=booking2.idbooking)
     db.session.add(ticket1)
     db.session.add(ticket2)
     db.session.add(ticket3)
