@@ -1,5 +1,5 @@
 # from flask_sqlalchemy.session import Session
-from lab4.models import app, db, AdditionalPassenger, Booking, Flight, Sit, Ticket, User
+from lab4.models import app, db, AdditionalPassenger, Booking, Flight, Seat, Ticket, Person
 
 # session = Session()
 with app.app_context():
