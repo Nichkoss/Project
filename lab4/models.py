@@ -1,15 +1,26 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import *
 from sqlalchemy.sql import func
-from marshmallow import Schema, fields
+from sqlalchemy.orm import Session, sessionmaker, scoped_session, declarative_base, backref
+from marshmallow import Schema, fields, validate, post_load, pre_load
+import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:databasesql2022@localhost:5432/airline"
+#app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:databasesql2022@localhost:5432/airline"
 
-db = SQLAlchemy(app)
+#db = SQLAlchemy(app)
+
+#SessionFactory = sessionmaker()
 #Session = scoped_session(SessionFactory)
-#session=db.session
+DB_URI="postgresql://postgres:databasesql2022@localhost:5432/airline"
+engine = create_engine(DB_URI)
+SessionFactory = sessionmaker(bind=engine)
+Session = scoped_session(SessionFactory)
+
+Base = declarative_base()
+
 class CustomBase():
     @classmethod
     def get_all(cls):
@@ -55,41 +66,150 @@ class CustomBase():
             session.commit()
             return 200
 
-    # @classmethod
-    # def get_with_filter(cls, parameters):
-    #     with Session() as session:
-    #         q = session.query(cls)
-    #         for attr, value in parameters.items():
-    #             q = q.filter(getattr(cls, attr).ilike(f"%%{value}%%"))
-    #
-    #         return q.all()
-class Booking(CustomBase, db.Model):
+    @classmethod
+    def get_with_filter(cls, parameters):
+        with Session() as session:
+            q = session.query(cls)
+            for attr, value in parameters.items():
+                q = q.filter(getattr(cls, attr).ilike(f"%%{value}%%"))
+
+            return q.all()
+
+class Person(CustomBase, Base):
+    __tablename__ = 'person'
+
+    idperson = Column(Integer, primary_key=True)
+    email = Column(String(50), unique=True, nullable=False)
+    password = Column(String(50))
+    creation_time = Column(DateTime(timezone=True), default=func.now())#timestamp??
+    mgr = Column(Boolean, nullable=True, default='NULL')
+    firstname = Column(String(50), nullable=False)
+    lastname = Column(String(50), nullable=False)
+    birthdate = Column(Date, nullable=False)
+    pass_ser = Column(String(50), nullable=False)
+    pass_num = Column(String(50), nullable=False)
+    expirydate = Column(Date, nullable=False)
+
+    def __repr__(self):
+        return "<User: '{}' '{}', email: '{}'>" \
+            .format(self.first_name, self.last_name, self.email)
+    def __init_(self, email, password, creation_time, mgr, firstname, lastname, birthdate, pass_ser, pass_num, expirydate):
+        self.email = email
+        self.password = password
+        self.creation_time = creation_time
+        self.mgr = mgr
+        self.firstname = firstname
+        self.lastname = lastname
+        self.birthdate = birthdate
+        self.pass_ser = pass_ser
+        self.pass_num = pass_num
+        self.expirydate = expirydate
+
+    # GET
+    @classmethod
+    def get_preview(cls, id):
+        with Session() as session:
+            user_object = session.query(cls).filter(getattr(cls, "idperson") == id).\
+                with_entities(Person.firstname, Person.lastname, Person.email, Person.idperson).first()
+            if user_object is None:
+                return 404
+
+            return user_object
+class PersonSchema(Schema):
+    idperson=fields.Integer()
+
+    email = fields.Email(required=True)
+    password = fields.String(required=True)
+    creation_time = fields.DateTime(required=True)
+    mgr = fields.Boolean(required=True)
+    firstname = fields.String(required=True)
+    lastname = fields.String(required=True)
+    birthdate = fields.Date(required=True)
+    pass_ser = fields.String(required=True)
+    pass_num = fields.String(required=True)
+    expirydate = fields.Date(required=True)
+
+class AdditionalPassenger(CustomBase, Base):
+    __tablename__ = 'additional_passenger'
+
+    idpassenger = Column(Integer, primary_key=True)
+    firstname = Column(String(50), nullable=False)
+    lastname = Column(String(50), nullable=False)
+    birthdate = Column(Date, nullable=False)
+    email = Column(String(50), unique=True, nullable=True)
+    pass_ser = Column(String(50), nullable=False)
+    pass_num = Column(String(50), nullable=False)
+    expirydate = Column(Date, nullable=False)
+
+    def __repr__(self):
+        return "<Additional passenger : '{}' '{}', email: '{}'>" \
+            .format(self.first_name, self.last_name, self.email)
+    def __init__(self, firstname, lastname, birthdate, email, pass_ser, pass_num, expirydate):
+        self.firstname = firstname
+        self.lastname = lastname
+        self.birthdate = birthdate
+        self.email = email
+        self.pass_ser = pass_ser
+        self.pass_num = pass_num
+        self.expirydate = expirydate
+
+    # GET
+    @classmethod
+    def get_preview(cls, id):
+        with Session() as session:
+            passenger_object = session.query(cls).filter(getattr(cls, "idpassenger") == id).\
+                with_entities(AdditionalPassenger.firstname, AdditionalPassenger.lastname, AdditionalPassenger.email, AdditionalPassenger.idpassenger).first()
+            if passenger_object is None:
+                return 404
+
+            return passenger_object
+class PassengerSchema(Schema):
+    idpassenger = fields.Integer()
+
+    firstname = fields.String(required=True)
+    lastname = fields.String(required=True)
+    birthdate = fields.Date(required=True)
+    email = fields.Email(required=True)
+    pass_ser = fields.String(required=True)
+    pass_num = fields.String(required=True)
+    expirydate = fields.Date(required=True)
+
+class Booking(CustomBase, Base):
     __tablename__ = 'booking'
-    idbooking = db.Column(db.Integer, primary_key=True)
-    total_price = db.Column(db.Float, nullable=False)
-    personid = db.Column(db.Integer, db.ForeignKey('person.idperson'))
+    idbooking = Column(Integer, primary_key=True)
+    total_price = Column(Float, nullable=False)
+    personid = Column(Integer, ForeignKey('person.idperson'))
     def __repr__(self):
         return "<Booking by user id: '{}', price: '{} >" \
             .format( self.userid, self.total_price)
     def __init__(self, total_price, personid):
         self.total_price=total_price
         self.personid=personid
+    @classmethod
+    def get_preview(cls, id):
+        with Session() as session:
+            booking_object = session.query(cls).filter(getattr(cls, "idbooking") == id).\
+                with_entities(Booking.total_price, Booking.idbooking).first()
+            if booking_object is None:
+                return 404
+
+            return booking_object
 class BookingSchema(Schema):
     idbooking= fields.Integer()
-    total_price=fields.float(required=True)
+    total_price=fields.Float(required=True)
 
     person=fields.Nested(PersonSchema, dump_only=True)
     personid=fields.Integer(load_only=True)
 
-class Flight(CustomBase, db.Model):
+class Flight(CustomBase, Base):
     __tablename__ = 'flight'
-    idflight = db.Column(db.Integer, primary_key=True)
-    city_from = db.Column(db.String(50), nullable=False)
-    city_to = db.Column(db.String(50), nullable=False)
-    airport_from = db.Column(db.String(50), nullable=False)
-    airport_to = db.Column(db.String(50), nullable=False)
-    max_sits = db.Column(db.Integer, nullable=False)
-    flight_date = db.Column(db.Date, nullable=False)
+    idflight = Column(Integer, primary_key=True)
+    city_from = Column(String(50), nullable=False)
+    city_to = Column(String(50), nullable=False)
+    airport_from = Column(String(50), nullable=False)
+    airport_to = Column(String(50), nullable=False)
+    max_sits = Column(Integer, nullable=False)
+    flight_date = Column(Date, nullable=False)
     def __repr__(self):
         return "<Flight  '{}' - '{}' on '{}'>" \
             .format(self.flight_from, self.flight_to, self.flight_date)
@@ -104,54 +224,20 @@ class Flight(CustomBase, db.Model):
 class FlightSchema(Schema):
     idflight = fields.Integer()
 
-    city_from = fields.String(50, required=True)
-    city_to = fields.String(50, required=True)
-    airport_from = fields.String(50, required=True)
-    airport_to = fields.String(50, required=True)
+    city_from = fields.String(required=True)
+    city_to = fields.String(required=True)
+    airport_from = fields.String(required=True)
+    airport_to = fields.String(required=True)
     max_sits = fields.Integer(required=True)
     flight_date = fields.Date(required=True)
 
-class AdditionalPassenger(CustomBase, db.Model):
-    __tablename__ = 'additional_passenger'
-
-    idpassenger = db.Column(db.Integer, primary_key=True)
-    firstname = db.Column(db.String(50), nullable=False)
-    lastname = db.Column(db.String(50), nullable=False)
-    birthdate = db.Column(db.Date, nullable=False)
-    email = db.Column(db.String(50), unique=True, nullable=True)
-    pass_ser = db.Column(db.String(50), nullable=False)
-    pass_num = db.Column(db.String(50), nullable=False)
-    expirydate = db.Column(db.Date, nullable=False)
-
-    def __repr__(self):
-        return "<Additional passenger : '{}' '{}', email: '{}'>" \
-            .format(self.first_name, self.last_name, self.email)
-    def __init__(self, firstname, lastname, birthdate, email, pass_ser, pass_num, expirydate):
-        self.firstname = firstname
-        self.lastname = lastname
-        self.birthdate = birthdate
-        self.email = email
-        self.pass_ser = pass_ser
-        self.pass_num = ass_num
-        self.expirydate = expirydate
-class PassengerSchema(Schema):
-    idpassenger = fields.Integer()
-
-    firstname = fields.String(50, required=True)
-    lastname = fields.String(50, required=True)
-    birthdate = fields.Date(required=True)
-    email = fields.Email(50, required=True)
-    pass_ser = fields.String(50, required=True)
-    pass_num = fields.String(50, required=True)
-    expirydate = fields.Date(required=True)
-
-class Seat(CustomBase, db.Model):
+class Seat(CustomBase, Base):
     __tablename__ = 'seat'
-    idseat = db.Column(db.Integer, primary_key=True)
-    seatnumber = db.Column(db.Integer, nullable=False)
-    available = db.Column(db.Boolean, nullable=False )
-    price = db.Column(db.Float, nullable=False )
-    flightid = db.Column(db.Integer, db.ForeignKey('flight.idflight'))
+    idseat = Column(Integer, primary_key=True)
+    seatnumber = Column(Integer, nullable=False)
+    available = Column(Boolean, nullable=False )
+    price = Column(Float, nullable=False )
+    flightid = Column(Integer, ForeignKey('flight.idflight'))
     def __repr__(self):
         return "<Sit number : '{}', availability : '{}', price: '{}'>" \
             .format(self.seatnumber, self.available, self.price)
@@ -171,15 +257,15 @@ class SeatSchema(Schema):
     flight = fields.Nested(FlightSchema, dump_only=True)
     flightid = fields.Integer(load_only=True)
 
-class Ticket(CustomBase, db.Model):
+class Ticket(CustomBase, Base):
     __tablename__ = 'ticket'
 
-    idticket = db.Column(db.Integer, primary_key=True)
-    extra_lug = db.Column(db.Integer, nullable=True)
-    creation_date = db.Column(db.DateTime(timezone=True), default=func.now())#timestamp??
-    seatid = db.Column(db.Integer, db.ForeignKey('seat.idseat'))
-    bookingid = db.Column(db.Integer, db.ForeignKey('booking.idbooking'))
-    passengerid = db.Column(db.Integer, db.ForeignKey('additional_passenger.idpassenger'))
+    idticket = Column(Integer, primary_key=True)
+    extra_lug = Column(Integer, nullable=True)
+    creation_date = Column(DateTime(timezone=True),default=datetime.datetime.utcnow)
+    seatid = Column(Integer, ForeignKey('seat.idseat'))
+    bookingid = Column(Integer, ForeignKey('booking.idbooking'))
+    passengerid = Column(Integer, ForeignKey('additional_passenger.idpassenger'))
 
     def __repr__(self):
         return "<Extra luggage: '{}', Time of creation: '{}'>" \
@@ -190,11 +276,21 @@ class Ticket(CustomBase, db.Model):
         self.seatid = seatid
         self.bookingid = bookingid
         self.passengerid = passengerid
+    # GET
+    @classmethod
+    def get_preview(cls, id):
+        with Session() as session:
+            ticket_object = session.query(cls).filter(getattr(cls, "idticket") == id).\
+                with_entities(Ticket.extra_lug, Ticket.creation_date, Ticket.idticket).first()
+            if ticket_object is None:
+                return 404
+
+            return ticket_object
 class TicketSchema(Schema):
     idticket=fields.Integer()
 
     extra_lug=fields.Integer(required=True)
-    creation_date=fields.DataTime(required=True)
+    creation_date=fields.DateTime(required=True)
 
     seatid=fields.Integer(load_only=True)
     seat=fields.Nested(SeatSchema, dump_only=True)
@@ -205,53 +301,11 @@ class TicketSchema(Schema):
     passengerid=fields.Integer(load_only=True)
     passenger=fields.Nested(PassengerSchema, dump_only=True)
 
-class Person(CustomBase, db.Model):
-    __tablename__ = 'person'
-
-    idperson = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(50))
-    creation_time = db.Column(db.DateTime(timezone=True), default=func.now())#timestamp??
-    mgr = db.Column(db.Boolean, nullable=True, default='NULL')
-    firstname = db.Column(db.String(50), nullable=False)
-    lastname = db.Column(db.String(50), nullable=False)
-    birthdate = db.Column(db.Date, nullable=False)
-    pass_ser = db.Column(db.String(50), nullable=False)
-    pass_num = db.Column(db.String(50), nullable=False)
-    expirydate = db.Column(db.Date, nullable=False)
-
-    def __repr__(self):
-        return "<User: '{}' '{}', email: '{}'>" \
-            .format(self.first_name, self.last_name, self.email)
-    def __init_(self, email, password, creation_time, mgr, firstname, lastname, birthdate, pass_ser, pass_num, expirydate):
-        self.email = email
-        self.password = password
-        self.creation_time = creation_time
-        self.mgr = mgr
-        self.firstname = firstname
-        self.lastname = lastname
-        self.birthdate = birthdate
-        self.pass_ser = pass_ser
-        self.pass_num = pass_num
-        self.expirydate = expirydate
-class PersonSchema(Schema):
-    idperson=fields.Integer()
-
-    email = fields.Email(50,required=True)
-    password = fields.String(50,required=True)
-    creation_time = fields.DataTime(required=True)
-    mgr = fields.Boolean(required=True)
-    firstname = fields.String(50,required=True)
-    lastname = fields.String(50,required=True)
-    birthdate = fields.Date(required=True)
-    pass_ser = fields.String(50,required=True)
-    pass_num = fields.String(50,required=True)
-    expirydate = fields.Date(required=True)
-
-
+if __name__ == "__main__":
+    pass
 #@app.route('/')
 #def home():
- #   return "boom"
+#    return "boom"
 
 
 #@app.route('/api/v1/hello-world-13')
