@@ -1,5 +1,5 @@
 # from flask_sqlalchemy.session import Session
-from lab4.models import Session, app, AdditionalPassenger, Booking, Flight, Seat, Ticket, Person
+from lab4.models import Session, app, Passenger, Booking, Flight, Seat, Ticket, Person
 
 session = Session()
 with app.app_context():
@@ -7,8 +7,8 @@ with app.app_context():
     user2 = Person(email="test4@gmail.com", password="12345", creation_time="2022-10-20 14:04:06.016547", mgr=1,
                 firstname="Lucy", lastname="Lockwood", birthdate="2001-09-08", pass_ser="GB", pass_num="789921",
                 expirydate="2024-08-14")
-    additional_passenger = AdditionalPassenger(firstname="Laura", lastname="Debberson", birthdate="1998-07-02", email="test13@gmail.com", pass_ser="KB", pass_num="997645", expirydate="2022-12-28")
-    additional_passenger2 = AdditionalPassenger(firstname="Dora", lastname="Dickens", birthdate="1998-01-22",
+    additional_passenger = Passenger(firstname="Laura", lastname="Debberson", birthdate="1998-07-02", email="test13@gmail.com", pass_ser="KB", pass_num="997645", expirydate="2022-12-28")
+    additional_passenger2 = Passenger(firstname="Dora", lastname="Dickens", birthdate="1998-01-22",
                                                email="test14@gmail.com", pass_ser="GB", pass_num="997335",
                                                expirydate="2022-12-28")
     flight = Flight(city_from="Berlin", city_to="Los Angeles", airport_from="Berlin Brandenburg Airport", airport_to="Berlin Brandenburg Airport", max_sits=300, flight_date="2023-01-03")

@@ -7,13 +7,12 @@ from sqlalchemy.orm import Session, sessionmaker, scoped_session, declarative_ba
 from marshmallow import Schema, fields, validate, post_load, pre_load
 import datetime
 
+
 app = Flask(__name__)
 #app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:databasesql2022@localhost:5432/airline"
 
 #db = SQLAlchemy(app)
 
-#SessionFactory = sessionmaker()
-#Session = scoped_session(SessionFactory)
 DB_URI="postgresql://postgres:databasesql2022@localhost:5432/airline"
 engine = create_engine(DB_URI)
 SessionFactory = sessionmaker(bind=engine)
@@ -38,7 +37,7 @@ class CustomBase():
     @classmethod
     def get_by_id(cls, id):
         with Session() as session:
-            class_id_attr = f"{cls.__name__}_id".lower()
+            class_id_attr = f"id{cls.__name__}".lower()
             class_object = session.query(cls).filter(getattr(cls, class_id_attr) == id).first()
             if class_object is None:
                 return 404
@@ -51,7 +50,7 @@ class CustomBase():
 
             if class_object == 404:
                 return 404
-            class_id_attr = f"{cls.__name__}_id".lower()
+            class_id_attr = f"id{cls.__name__}".lower()
             session.query(cls).filter(getattr(cls, class_id_attr) == id).delete()
             session.commit()
             return 200
@@ -61,7 +60,7 @@ class CustomBase():
         with Session() as session:
             if cls.get_by_id(id) == 404:
                 return 404
-            class_id_attr = f"{cls.__name__}_id".lower()
+            class_id_attr = f"id{cls.__name__}".lower()
             session.query(cls).filter(getattr(cls, class_id_attr) == id).update(updates)
             session.commit()
             return 200
@@ -129,8 +128,8 @@ class PersonSchema(Schema):
     pass_num = fields.String(required=True)
     expirydate = fields.Date(required=True)
 
-class AdditionalPassenger(CustomBase, Base):
-    __tablename__ = 'additional_passenger'
+class Passenger(CustomBase, Base):
+    __tablename__ = 'passenger'
 
     idpassenger = Column(Integer, primary_key=True)
     firstname = Column(String(50), nullable=False)
@@ -158,7 +157,7 @@ class AdditionalPassenger(CustomBase, Base):
     def get_preview(cls, id):
         with Session() as session:
             passenger_object = session.query(cls).filter(getattr(cls, "idpassenger") == id).\
-                with_entities(AdditionalPassenger.firstname, AdditionalPassenger.lastname, AdditionalPassenger.email, AdditionalPassenger.idpassenger).first()
+                with_entities(Passenger.firstname, Passenger.lastname, Passenger.email, Passenger.idpassenger).first()
             if passenger_object is None:
                 return 404
 
@@ -221,6 +220,17 @@ class Flight(CustomBase, Base):
         self.airport_to=airport_to
         self.max_sits=max_sits
         self.flight_date=flight_date
+
+    # GET
+    @classmethod
+    def get_preview(cls, id):
+        with Session() as session:
+            flight_object = session.query(cls).filter(getattr(cls, "idflight") == id).\
+                with_entities(Flight.city_from, Flight.city_to, Flight.max_sits, Flight.flight_date, Flight.idflight).first()
+            if flight_object is None:
+                return 404
+
+            return flight_object
 class FlightSchema(Schema):
     idflight = fields.Integer()
 
@@ -247,6 +257,17 @@ class Seat(CustomBase, Base):
         self.available = available
         self.price = price
         self.flightid = flightid
+
+    # GET
+    @classmethod
+    def get_preview(cls, id):
+        with Session() as session:
+            seat_object = session.query(cls).filter(getattr(cls, "idseat") == id).\
+                with_entities(Seat.seatnumber, Seat.available, Seat.price, Seat.idseat).first()
+            if seat_object is None:
+                return 404
+
+            return seat_object
 class SeatSchema(Schema):
     idseat = fields.Integer()
 
@@ -265,7 +286,7 @@ class Ticket(CustomBase, Base):
     creation_date = Column(DateTime(timezone=True),default=datetime.datetime.utcnow)
     seatid = Column(Integer, ForeignKey('seat.idseat'))
     bookingid = Column(Integer, ForeignKey('booking.idbooking'))
-    passengerid = Column(Integer, ForeignKey('additional_passenger.idpassenger'))
+    passengerid = Column(Integer, ForeignKey('passenger.idpassenger'))
 
     def __repr__(self):
         return "<Extra luggage: '{}', Time of creation: '{}'>" \

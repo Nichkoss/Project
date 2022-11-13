@@ -65,7 +65,7 @@ CREATE TABLE ticket (
   passengerid int NULL,
   PRIMARY KEY (idticket),
   FOREIGN KEY (bookingid) REFERENCES booking (idbooking),
-  FOREIGN KEY (passengerid) REFERENCES additional_passenger (idpassenger),
+  FOREIGN KEY (passengerid) REFERENCES passenger (idpassenger),
   FOREIGN KEY (seatid) REFERENCES seat (idseat)
 );
 
