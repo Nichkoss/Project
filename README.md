@@ -1,3 +1,6 @@
+# Дівчатка))
+Файл main.py не юзайте, в app.py запускати сервер. в blueprint.py прописані шляхи
+
 1. Install python 3.8.2
  - pyenv install 3.8.2
 2. Create virtual environment:
