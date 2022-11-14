@@ -278,15 +278,35 @@ def get_flight(id):
     response = Flight.get_preview(id)
     return dump_or_404(response, FlightSchema())
 
-@api_blueprint.route("/flights/<id>/freeseats", methods=['GET'])
-def get_flight_freeseats(id):
-    response = Flight.get_preview(id)
-    return dump_or_404(response, FlightSchema())
+# @api_blueprint.route("/flights/<id>/freeseats", methods=['GET'])
+# def get_flight_freeseats(id):
+#     response = Flight.get_preview(id)
+#     return dump_or_404(response, FlightSchema())
+#
+# @api_blueprint.route("/flights/<id>/usedseats", methods=['GET'])
+# def get_flight_usedseats(id):
+#     response = Flight.get_preview(id)
+#     return dump_or_404(response, FlightSchema())
 
-@api_blueprint.route("/flights/<id>/usedseats", methods=['GET'])
-def get_flight_usedseats(id):
-    response = Flight.get_preview(id)
-    return dump_or_404(response, FlightSchema())
+# @api_blueprint.route("/flights/<id>/freeseats", methods=['GET'])
+# def get_freeseats_of_flight():
+#     args = request.args
+#
+#     if args != {}:
+#         response = Seat.get_with_filter(args)
+#     else:
+#         response = Seat.get_all()
+#
+#     return jsonify(SeatSchema().dump(response, many=True))
+
+@api_blueprint.route("/flights/<id>/seats", methods=['GET'])#
+def get_seats_for_flight(id):
+    flight_object=Flight.get_by_id(id)
+    if flight_object==404:
+        return Response("Invalid id", status=404)
+    else:
+        return jsonify(SeatSchema().dump(Flight.get_seats(id), many=True))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

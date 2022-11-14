@@ -231,6 +231,12 @@ class Flight(CustomBase, Base):
                 return 404
 
             return flight_object
+
+    @classmethod
+    def get_seats(cls, id):
+        with Session() as session:
+            return session.query(Seat).filter_by(flightid = id)\
+                .with_entities(Seat.seatnumber,Seat.available,Seat.price).all()
 class FlightSchema(Schema):
     idflight = fields.Integer()
 
