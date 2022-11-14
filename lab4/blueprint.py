@@ -11,13 +11,13 @@ import operator
 
 from flask import Blueprint, request, jsonify,Response
 from marshmallow import ValidationError
+from flask_bcrypt import Bcrypt
 #from flask_swagger_ui import get_swaggerui_blueprint
 
-from db_utils import *
 from lab4.models import *
-from resp_error import errors
 
 api_blueprint = Blueprint('api', __name__)
+
 # session = Session()
 STUDENT_ID = 13
 @api_blueprint.route("/hello-world")
@@ -29,27 +29,10 @@ def hello_world_def():
 def hello_world():
     return f"Hello world {STUDENT_ID}"
 
-
-#################################################################
-# @api_blueprint.route("/user", methods=["POST"])
-# def create_user():
-#     json_data = request.json
-#     if not json_data:
-#         return errors.bad_request
-#     try:
-#         user_data = PersonSchema().load(json_data)
-#     except ValidationError as err:
-#         return err.messages, 422
-#     user = session.query(Person).filter_by(username=user_data["username"]).first()
-#     if user:
-#         return errors.exists
-#     user = create_entry(User, **user_data)
-#     return jsonify(UserData().dump(user)), 200
-
 #################################################################
 # def create_app(testing: bool = True):
     app = Flask(__name__)
-
+bcrypt=Bcrypt(app)
 
 def dump_or_404(data, Schema):
     if data == 404:
@@ -73,6 +56,7 @@ def get_users():
 @api_blueprint.route("/users", methods=['POST'])
 def create_user():
     user_json = PersonSchema().load(request.get_json())
+    user_json['password']=bcrypt.generate_password_hash(user_json['password'])
     user_object = Person(**user_json)
 
     response = Person.post_one(user_object)
@@ -81,6 +65,13 @@ def create_user():
 
 @api_blueprint.route("/users/<id>", methods=['PUT'])
 def update_user(id):
+    fields_to_update = PersonSchema().load(request.get_json(), partial=True)
+
+    response = Person.update_one(id, fields_to_update)
+    return Response(f"status: {response}", status=response)
+
+@api_blueprint.route("/users/<id>/newstatus", methods=['PUT'])
+def update_user_status(id):
     fields_to_update = PersonSchema().load(request.get_json(), partial=True)
 
     response = Person.update_one(id, fields_to_update)
@@ -157,6 +148,12 @@ def update_booking(id):
     response = Booking.update_one(id, fields_to_update)
     return Response(f"status: {response}", status=response)
 
+@api_blueprint.route("/bookings/<id>/getdiscount", methods=['PUT'])
+def update_booking_price(id):
+    fields_to_update = BookingSchema().load(request.get_json(), partial=True)
+
+    response = Booking.update_one(id, fields_to_update)
+    return Response(f"status: {response}", status=response)
 @api_blueprint.route("/bookings/<id>", methods=['DELETE'])
 def delete_booking(id):
     response = Booking.delete_by_id(id)
@@ -278,6 +275,16 @@ def delete_flight(id):
 
 @api_blueprint.route("/flights/<id>", methods=['GET'])
 def get_flight(id):
+    response = Flight.get_preview(id)
+    return dump_or_404(response, FlightSchema())
+
+@api_blueprint.route("/flights/<id>/freeseats", methods=['GET'])
+def get_flight_freeseats(id):
+    response = Flight.get_preview(id)
+    return dump_or_404(response, FlightSchema())
+
+@api_blueprint.route("/flights/<id>/usedseats", methods=['GET'])
+def get_flight_usedseats(id):
     response = Flight.get_preview(id)
     return dump_or_404(response, FlightSchema())
 

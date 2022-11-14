@@ -79,7 +79,7 @@ class Person(CustomBase, Base):
 
     idperson = Column(Integer, primary_key=True)
     email = Column(String(50), unique=True, nullable=False)
-    password = Column(String(50))
+    password = Column(String())
     creation_time = Column(DateTime(timezone=True), default=func.now())#timestamp??
     mgr = Column(Boolean, nullable=True, default='NULL')
     firstname = Column(String(50), nullable=False)
