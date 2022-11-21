@@ -1,6 +1,9 @@
 # Дівчатка))
 Файл main.py не юзайте, в app.py запускати сервер. в blueprint.py прописані шляхи
 
+# Два обєкти юзерів(персон) і пошта/пароль до них.
+![image](https://user-images.githubusercontent.com/113307928/202979029-213f69f3-aaa9-4ec1-8e76-a410c5d78bde.png)
+
 1. Install python 3.8.2
  - pyenv install 3.8.2
 2. Create virtual environment:
