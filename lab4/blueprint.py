@@ -25,39 +25,39 @@ CORS(app)
 auth = HTTPBasicAuth()
 
 
-
-
-
-def auth_required(f):
-     @wraps(f)
-     def decorated(*args, **kwargs):
-         auth= request.authorization
-         if auth and auth.username=='test5@gmail.com' and auth.password =='12345':
-            return f(*args, **kwargs)
-
-         return make_response('couldnt verify your login or password!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
-     return decorated
-     # session = Session()
-def auth_required_all(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth = request.authorization
-        if auth and auth.username == 'mgr4@gmail.com' and auth.password == '12345':
-            return f(*args, **kwargs)
-
-        return make_response('couldnt verify your login or password!', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
-    return decorated
-    # session = Session()
-def auth__required(email, password):
-    session = Session()
-    persons = session.query(Person)
-    users = [i.email for i in persons]
-    if email in users:
-        passs = session.query(Person).filter(Person.email == email).first()
-        session.close()
-        return check_password_hash(passs.password, password)
-    return False
+#
+#
+#
+# def auth_required(f):
+#      @wraps(f)
+#      def decorated(*args, **kwargs):
+#          auth= request.authorization
+#          if auth and auth.username=='test5@gmail.com' and auth.password =='12345':
+#             return f(*args, **kwargs)
+#
+#          return make_response('couldnt verify your login or password!', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+#      return decorated
+#      # session = Session()
+# def auth_required_all(f):
+#     @wraps(f)
+#     def decorated(*args, **kwargs):
+#         auth = request.authorization
+#         if auth and auth.username == 'mgr4@gmail.com' and auth.password == '12345':
+#             return f(*args, **kwargs)
+#
+#         return make_response('couldnt verify your login or password!', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+#
+#     return decorated
+#     # session = Session()
+# def auth__required(email, password):
+#     session = Session()
+#     persons = session.query(Person)
+#     users = [i.email for i in persons]
+#     if email in users:
+#         passs = session.query(Person).filter(Person.email == email).first()
+#         session.close()
+#         return check_password_hash(passs.password, password)
+#     return False
 # def pass_required(func):
 #     # decorator factory which invoks update_wrapper() method and passes decorated function as an argument
 #     @wraps(func)
@@ -168,6 +168,50 @@ def create_user():
     response = Person.post_one(user_object)
     return Response(f"Status: {response}", status=response)
     return app
+
+# @app.route("/users/login", methods=['POST'])
+# @auth.login_required(role=['client', 'manager'])
+# def login():
+#     if request.method == 'POST' and request.is_json:
+#         session = Session()
+#         login_data = request.get_json()
+#         user_login = session.query(Person).filter_by(email=login_data['email']).first()
+#         session.close()
+#
+#         if user_login is None:
+#             return {
+#                 "message": "There is no user with such email"
+#             }, 412
+#         elif not check_password_hash(user_login.password, login_data['password']):
+#             return {
+#                 "message": "Incorrect password"
+#             }, 412
+#         else:
+#             return {
+#                 "id": user_login.id,
+#                 "message": "Success"
+#             }, 201
+#     else:
+#         return {
+#             'message': "Incorrect request"
+#         }, 400
+
+@app.route('/users/login', methods=['POST'])
+@auth.login_required(role=['client','manager'])
+def login():
+    return jsonify(PersonSchema().dump(auth.current_user())), 200
+
+@app.route("/users/logout", methods=['DELETE'])
+@auth.login_required(role=['client', 'manager'])
+def logout():
+    if request.method == 'DELETE':
+        return {
+            "message": "Success"
+        }, 200
+    else:
+        return {
+            'message': "Incorrect request"
+        }, 400
 
 @api_blueprint.route("/users/<id>", methods=['PUT'])
 @auth.login_required(role=['client','manager'])
