@@ -334,6 +334,7 @@ class TicketSchema(Schema):
 
 if __name__ == "__main__":
     pass
+    #Base.metadata.create_all(bind=engine)
 #@app.route('/')
 #def home():
 #    return "boom"

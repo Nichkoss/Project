@@ -1,5 +1,5 @@
 from logging.config import fileConfig
-from lab4.models import db
+from lab4.models import Base
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -10,7 +10,7 @@ from alembic import context
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-target_metadata = db.metadata
+target_metadata = Base.metadata
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
