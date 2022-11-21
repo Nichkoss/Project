@@ -5,6 +5,7 @@ from sqlalchemy import *
 from sqlalchemy.sql import func
 from sqlalchemy.orm import Session, sessionmaker, scoped_session, declarative_base, backref
 from marshmallow import Schema, fields, validate, post_load, pre_load
+from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 
 
@@ -81,7 +82,7 @@ class Person(CustomBase, Base):
     email = Column(String(50), unique=True, nullable=False)
     password = Column(String())
     creation_time = Column(DateTime(timezone=True), default=func.now())#timestamp??
-    mgr = Column(Boolean, nullable=True, default='NULL')
+    role = Column(String, nullable=False, default='client')
     firstname = Column(String(50), nullable=False)
     lastname = Column(String(50), nullable=False)
     birthdate = Column(Date, nullable=False)
@@ -92,11 +93,11 @@ class Person(CustomBase, Base):
     def __repr__(self):
         return "<User: '{}' '{}', email: '{}'>" \
             .format(self.first_name, self.last_name, self.email)
-    def __init_(self, email, password, creation_time, mgr, firstname, lastname, birthdate, pass_ser, pass_num, expirydate):
+    def __init_(self, email, password, creation_time, role, firstname, lastname, birthdate, pass_ser, pass_num, expirydate):
         self.email = email
         self.password = password
         self.creation_time = creation_time
-        self.mgr = mgr
+        self.role = role
         self.firstname = firstname
         self.lastname = lastname
         self.birthdate = birthdate
@@ -104,12 +105,14 @@ class Person(CustomBase, Base):
         self.pass_num = pass_num
         self.expirydate = expirydate
 
+    def get_roles(self):
+        return self.role
     # GET
     @classmethod
     def get_preview(cls, id):
         with Session() as session:
             user_object = session.query(cls).filter(getattr(cls, "idperson") == id).\
-                with_entities(Person.firstname, Person.lastname, Person.email, Person.idperson).first()
+                with_entities(Person.firstname, Person.lastname, Person.email, Person.idperson, Person.password).first()
             if user_object is None:
                 return 404
 
@@ -118,9 +121,10 @@ class PersonSchema(Schema):
     idperson=fields.Integer()
 
     email = fields.Email(required=True)
-    password = fields.String(required=True)
+    password = fields.Function(deserialize=lambda password: generate_password_hash(password),
+                               load_only=True, required=True)
     creation_time = fields.DateTime(required=True)
-    mgr = fields.Boolean(required=True)
+    role = fields.String(dump_default='client',validate=validate.OneOf(["client", "manager"]), required=True)
     firstname = fields.String(required=True)
     lastname = fields.String(required=True)
     birthdate = fields.Date(required=True)
