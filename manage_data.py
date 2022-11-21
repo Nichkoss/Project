@@ -3,8 +3,8 @@ from lab4.models import Session, app, Passenger, Booking, Flight, Seat, Ticket, 
 
 session = Session()
 with app.app_context():
-    user = Person(email="test3@gmail.com", password="qwqwqwqwqw", creation_time="2022-07-24 14:04:06.016547", mgr=0, firstname="Mary", lastname="Topmpson", birthdate="2008-11-22", pass_ser="GB", pass_num="808056", expirydate="2023-11-12")
-    user2 = Person(email="test4@gmail.com", password="12345", creation_time="2022-10-20 14:04:06.016547", mgr=1,
+    user = Person(email="test3@gmail.com", password="qwqwqwqwqw", creation_time="2022-07-24 14:04:06.016547", role='client', firstname="Mary", lastname="Topmpson", birthdate="2008-11-22", pass_ser="GB", pass_num="808056", expirydate="2023-11-12")
+    user2 = Person(email="test4@gmail.com", password="12345", creation_time="2022-10-20 14:04:06.016547", role='manager',
                 firstname="Lucy", lastname="Lockwood", birthdate="2001-09-08", pass_ser="GB", pass_num="789921",
                 expirydate="2024-08-14")
     additional_passenger = Passenger(firstname="Laura", lastname="Debberson", birthdate="1998-07-02", email="test13@gmail.com", pass_ser="KB", pass_num="997645", expirydate="2022-12-28")
