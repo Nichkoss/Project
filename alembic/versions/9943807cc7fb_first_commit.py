@@ -43,7 +43,7 @@ def upgrade() -> None:
     op.create_table('person',
     sa.Column('idperson', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(length=50), nullable=False),
-    sa.Column('password', sa.String(length=50), nullable=True),
+    sa.Column('password', sa.String(length=250), nullable=True),
     sa.Column('creation_time', sa.DateTime(timezone=True), nullable=True),
     sa.Column('role', sa.String(length=50), nullable=True),
     sa.Column('firstname', sa.String(length=50), nullable=False),

@@ -9,7 +9,6 @@
 
 from flask import Blueprint, request, jsonify,Response, make_response
 from functools import wraps
-from flask_cors import CORS
 from marshmallow import ValidationError
 #from flask_bcrypt import Bcrypt, generate_password_hash, check_password_hash
 from werkzeug.security import check_password_hash
@@ -19,8 +18,6 @@ from flask_httpauth import HTTPBasicAuth
 from lab4.models import *
 
 api_blueprint = Blueprint('api', __name__)
-
-CORS(app)
 
 auth = HTTPBasicAuth()
 
@@ -90,20 +87,20 @@ auth = HTTPBasicAuth()
 #         return f(**kwargs)
 #
 #     return wrapped_view
-STUDENT_ID = 13
-@api_blueprint.route("/hello-world")
-@auth.login_required
-def hello_world_def():
-    return f"Hello world"
-@api_blueprint.route(f"/hello-world-{STUDENT_ID}")
-@auth.login_required
-def hello_world():
-    return f"Hello world {STUDENT_ID}"
+# STUDENT_ID = 13
+# @api_blueprint.route("/hello-world")
+# @auth.login_required
+# def hello_world_def():
+#     return f"Hello world"
+# @api_blueprint.route(f"/hello-world-{STUDENT_ID}")
+# @auth.login_required
+# def hello_world():
+#     return f"Hello world {STUDENT_ID}"
 
 
 #################################################################
 # def create_app(testing: bool = True):
-    app = Flask(__name__)
+app = Flask(__name__)
 # bcrypt=Bcrypt(app)
 @auth.verify_password
 def verify_password(u_email, u_password):
@@ -167,7 +164,7 @@ def create_user():
 
     response = Person.post_one(user_object)
     return Response(f"Status: {response}", status=response)
-    return app
+
 
 # @app.route("/users/login", methods=['POST'])
 # @auth.login_required(role=['client', 'manager'])
@@ -196,22 +193,22 @@ def create_user():
 #             'message': "Incorrect request"
 #         }, 400
 
-@app.route('/users/login', methods=['POST'])
+@api_blueprint.route('/users/login', methods=['POST'])
 @auth.login_required(role=['client','manager'])
-def login():
+def login_user():
     return jsonify(PersonSchema().dump(auth.current_user())), 200
 
-@app.route("/users/logout", methods=['DELETE'])
+@api_blueprint.route("/users/logout", methods=['DELETE'])
 @auth.login_required(role=['client', 'manager'])
 def logout():
-    if request.method == 'DELETE':
+    # if request.method == 'DELETE':
         return {
             "message": "Success"
         }, 200
-    else:
-        return {
-            'message': "Incorrect request"
-        }, 400
+    # else:
+    #     return {
+    #         'message': "Incorrect request"
+    #     }, 400
 
 @api_blueprint.route("/users/<id>", methods=['PUT'])
 @auth.login_required(role=['client','manager'])
@@ -284,10 +281,10 @@ def get_passenger(id):
 def get_bookings():
     args = request.args
 
-    if args != {}:
-        response = Booking.get_with_filter(args)
-    else:
-        response = Booking.get_all()
+    # if args != {}:
+    #     response = Booking.get_with_filter(args)
+    # else:
+    response = Booking.get_all()
 
     return jsonify(BookingSchema().dump(response, many=True))
 
@@ -299,7 +296,7 @@ def create_booking():
 
     response = Booking.post_one(booking_object)
     return Response(f"Status: {response}", status=response)
-    return app
+
 
 @api_blueprint.route("/bookings/<id>", methods=['PUT'])
 @auth.login_required(role='client')
@@ -334,10 +331,10 @@ def get_booking(id):
 def get_tickets():
     args = request.args
 
-    if args != {}:
-        response = Ticket.get_with_filter(args)
-    else:
-        response = Ticket.get_all()
+    # if args != {}:
+    #     response = Ticket.get_with_filter(args)
+    # else:
+    response = Ticket.get_all()
 
     return jsonify(TicketSchema().dump(response, many=True))
 @api_blueprint.route("/tickets", methods=['POST'])
@@ -348,7 +345,7 @@ def create_ticket():
 
     response = Ticket.post_one(ticket_object)
     return Response(f"Status: {response}", status=response)
-    return app
+
 
 @api_blueprint.route("/tickets/<id>", methods=['PUT'])
 @auth.login_required(role='client')
@@ -376,10 +373,10 @@ def get_ticket(id):
 def get_seats():
     args = request.args
 
-    if args != {}:
-        response = Seat.get_with_filter(args)
-    else:
-        response = Seat.get_all()
+    # if args != {}:
+    #     response = Seat.get_with_filter(args)
+    # else:
+    response = Seat.get_all()
 
     return jsonify(SeatSchema().dump(response, many=True))
 @api_blueprint.route("/seats", methods=['POST'])
@@ -391,7 +388,6 @@ def create_seat():
     response = Seat.post_one(seat_object)
     return Response(f"Status: {response}", status=response)
 
-    return app
 
 @api_blueprint.route("/seats/<id>", methods=['PUT'])
 @auth.login_required(role='manager')
@@ -420,10 +416,10 @@ def get_seat(id):
 def get_flights():
     args = request.args
 
-    if args != {}:
-        response = Flight.get_with_filter(args)
-    else:
-        response = Flight.get_all()
+    # if args != {}:
+    #     response = Flight.get_with_filter(args)
+    # else:
+    response = Flight.get_all()
 
     return jsonify(FlightSchema().dump(response, many=True))
 @api_blueprint.route("/flights", methods=['POST'])
@@ -435,7 +431,6 @@ def create_flight():
     response = Flight.post_one(flight_object)
     return Response(f"Status: {response}", status=response)
 
-    return app
 
 @api_blueprint.route("/flights/<id>", methods=['PUT'])
 @auth.login_required(role='manager')

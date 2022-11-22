@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 #db = SQLAlchemy(app)
 
-DB_URI="postgresql://postgres:databasesql2022@localhost:5432/airline"
+DB_URI="postgresql://postgres:leisuregurube@localhost:5432/airline"
 engine = create_engine(DB_URI)
 SessionFactory = sessionmaker(bind=engine)
 Session = scoped_session(SessionFactory)
@@ -201,7 +201,7 @@ class BookingSchema(Schema):
     idbooking= fields.Integer()
     total_price=fields.Float(required=True)
 
-    person=fields.Nested(PersonSchema, dump_only=True)
+   # person=fields.Nested(PersonSchema, dump_only=True)
     personid=fields.Integer(load_only=True)
 
 class Flight(CustomBase, Base):
@@ -285,7 +285,7 @@ class SeatSchema(Schema):
     available = fields.Boolean(required=True)
     price = fields.Float(required=True)
 
-    flight = fields.Nested(FlightSchema, dump_only=True)
+    #flight = fields.Nested(FlightSchema, dump_only=True)
     flightid = fields.Integer(load_only=True)
 
 class Ticket(CustomBase, Base):
@@ -296,7 +296,7 @@ class Ticket(CustomBase, Base):
     creation_date = Column(DateTime(timezone=True),default=datetime.datetime.utcnow)
     seatid = Column(Integer, ForeignKey('seat.idseat'))
     bookingid = Column(Integer, ForeignKey('booking.idbooking'))
-    passengerid = Column(Integer, ForeignKey('passenger.idpassenger'))
+    passengerid = Column(Integer, ForeignKey('person.idperson'))
 
     def __repr__(self):
         return "<Extra luggage: '{}', Time of creation: '{}'>" \
@@ -324,13 +324,13 @@ class TicketSchema(Schema):
     creation_date=fields.DateTime(required=True)
 
     seatid=fields.Integer(load_only=True)
-    seat=fields.Nested(SeatSchema, dump_only=True)
+ #   seat=fields.Nested(SeatSchema, dump_only=True)
 
     bookingid=fields.Integer(load_only=True)
-    booking=fields.Nested(BookingSchema, dump_only=True)
+ #   booking=fields.Nested(BookingSchema, dump_only=True)
 
     passengerid=fields.Integer(load_only=True)
-    passenger=fields.Nested(PassengerSchema, dump_only=True)
+  #  passenger=fields.Nested(PassengerSchema, dump_only=True)
 
 if __name__ == "__main__":
     pass

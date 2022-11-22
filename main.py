@@ -62,14 +62,14 @@ def create_app(testing: bool = True):
         # if args != {}:
         #     response = AdditionalPassenger.get_with_filter(args)
         # else:
-        response = AdditionalPassenger.get_all()
+        response = Passenger.get_all()
 
         return jsonify(PassengerSchema().dump(response, many=True))
 
     @api_blueprint.route("/api/v1/passengers", methods=['POST'])
     def create_passenger():
         passenger_json = PassengerSchema().load(request.get_json())
-        passenger_object = Passenger(**user_json)
+        passenger_object = Passenger(**passenger_json)
 
         response = Passenger.post_one(passenger_object)
         return Response(f"Status: {response}", status=response)
@@ -92,7 +92,7 @@ def create_app(testing: bool = True):
     @api_blueprint.route("/api/v1/bookings", methods=['POST'])
     def create_booking():
         booking_json = BookingSchema().load(request.get_json())
-        booking_object = Booking(**user_json)
+        booking_object = Booking(**booking_json)
 
         response = Booking.post_one(booking_object)
         return Response(f"Status: {response}", status=response)
@@ -119,7 +119,7 @@ def create_app(testing: bool = True):
     @api_blueprint.route("/api/v1/tickets", methods=['POST'])
     def create_ticket():
         ticket_json = TicketSchema().load(request.get_json())
-        ticket_object = Ticket(**user_json)
+        ticket_object = Ticket(**ticket_json)
 
         response = Ticket.post_one(ticket_object)
         return Response(f"Status: {response}", status=response)
@@ -147,7 +147,7 @@ def create_app(testing: bool = True):
     @api_blueprint.route("/api/v1/tickets", methods=['POST'])
     def create_ticket():
         ticket_json = TicketSchema().load(request.get_json())
-        ticket_object = Ticket(**user_json)
+        ticket_object = Ticket(**ticket_json)
 
         response = Ticket.post_one(ticket_object)
         return Response(f"Status: {response}", status=response)
