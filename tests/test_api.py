@@ -18,53 +18,6 @@ class TestApi(TestCase):
 
     def setUp(self):
         super().setUp()
-        self.create_tables()
-        self.client_data = {
-
-            "email": "u1@gmail.com",
-            "password": "12345",
-            "creation_time": "2022-11-11T23:23",
-            "role": "client",
-            "firstname": "u1fname",
-            "lastname": "u1lname",
-            "birthdate": "2022-01-01",
-            "pass_ser": "KA",
-            "pass_num": "121212",
-            "expirydate": "2022-02-02"
-        }
-        self.client_right_credentials = {
-            "email": "u1.@gmail.com",
-            "password": "12345"
-        }
-        self.client_wrong_pass_credentials = {
-            "email": "u1.@gmail.com",
-            "password": "1234"
-        }
-        #both client and manager
-        self.user_wrong_email = {
-            "email": "uu1.@gmail.com",
-            "password": "1234"
-        }
-        self.manager_data = {
-            "email": "m1.@gmail.com",
-            "password": "12345",
-            "creation_time": "2022-11-11T23:23",
-            "role": "manager",
-            "firstname": "m1fname",
-            "lastname": "m1lname",
-            "birthdate": "2022-01-01",
-            "pass_ser": "KA",
-            "pass_num": "121212",
-            "expirydate": "2022-02-02"
-        }
-        self.manager_right_credentials = {
-            "email": "m1.@gmail.com",
-            "password": "12345"
-        }
-        self.manager_wrong_pass_credentials = {
-            "email": "mm1.@gmail.com",
-            "password": "1234"
-        }
 
 
     def get_basic_client_headers(self):
@@ -81,7 +34,6 @@ class TestApi(TestCase):
     def tearDown(self):
         self.close_session()
     def create_app(self):
-        # app.register_blueprint(api_blueprint, url_prefix="/api/v1")
         return app
 
 
